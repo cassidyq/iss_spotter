@@ -27,4 +27,32 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://ipvigilante.com/${ip}`, (error, response, body) => {
+    if (error) return callback(error, null); //check if request returned an error and return error via callback
+
+    if (response.statusCode !== 200) {
+      //check response to ensure no error
+      callback(
+        Error(
+          `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`
+        ),
+        null
+      ); //return error message via callback
+      return;
+    }
+    // if everything ran successfully parse body for IP Address info
+    const ipInfo = JSON.parse(body);
+
+    const coords = {
+      latitude: ipInfo.data.latitude,
+      longitude: ipInfo.data.longitude
+    };
+    callback(null, coords); //return IP via callback
+  });
+};
+
+module.exports = {
+  // fetchMyIP,
+  fetchCoordsByIP
+};
