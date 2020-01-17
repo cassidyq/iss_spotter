@@ -52,7 +52,30 @@ const fetchCoordsByIP = function(ip, callback) {
   });
 };
 
+const fetchISSFlyOverTimes = function(coords, callback) {
+  const url = `http://api.open-notify.org/iss-pass.json?lat=${coords.latitude}&lon=${coords.longitude}`;
+  request(url, (error, response, body) => {
+    if (error) return callback(error, null); //check if request returned an error and return error via callback
+
+    if (response.statusCode !== 200) {
+      //check response to ensure no error
+      callback(
+        Error(
+          `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`
+        ),
+        null
+      ); //return error message via callback
+      return;
+    }
+    // if everything ran successfully parse body for flyby times
+    const passes = JSON.parse(body).response;
+
+    callback(null, passes); //return IP via callback
+  });
+};
+
 module.exports = {
   // fetchMyIP,
-  fetchCoordsByIP
+  // fetchCoordsByIP,
+  fetchISSFlyOverTimes
 };
